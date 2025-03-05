@@ -9,4 +9,10 @@
     <color name="inputBackground">#FFE8E8</color>
     <color name="textGray">#666666</color>
     <color name="linkColor">#FF4E4E</color>
+    <color name="cardCardiologia">#FF4E4E</color>
+    <color name="cardMedicina">#40E0D0</color>
+    <color name="cardNutricion">#90EE90</color>
+    <color name="cardNeumologia">#4169E1</color>
+    <color name="settingsBackground">#FFF0F0</color>
+    <color name="bottomNavBackground">#FFFFFF</color>
 </resources>

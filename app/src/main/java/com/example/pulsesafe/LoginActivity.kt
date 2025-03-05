@@ -33,17 +33,14 @@ class LoginActivity : AppCompatActivity() {
 
         // Configurar botón de login
         loginButton.setOnClickListener {
-            // Aquí iría la lógica de validación y autenticación
             val email = emailEditText.text.toString().trim()
             val password = passwordEditText.text.toString().trim()
 
             if (validateInputs(email, password)) {
-                // Simulación de login exitoso
-                // En una app real, aquí iría la llamada a tu API o servicio de autenticación
-                // Por ahora, simplemente navegamos a una pantalla principal ficticia
-                // Intent intent = new Intent(this, MainActivity.class);
-                // startActivity(intent);
-                // finish();
+                // Redirigir a MainActivity
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                finish() // Cierra la actividad de login para que no vuelva atrás
             }
         }
 
