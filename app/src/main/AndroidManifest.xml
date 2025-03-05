@@ -13,6 +13,15 @@
         android:theme="@style/Theme.PulseSafe"
         tools:targetApi="31">
         <activity
+            android:name=".HelpActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PrivacyPolicyActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PersonalDataActivity"
+            android:exported="false" />
+        <activity
             android:name=".AlertsActivity"
             android:exported="false" />
         <activity

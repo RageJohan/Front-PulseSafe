@@ -5,17 +5,148 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
+    <!-- Header -->
+    <ImageButton
+        android:id="@+id/backButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="16dp"
+        android:background="@drawable/circle_background_light"
+        android:src="@drawable/ic_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/colorPrimary" />
+
     <TextView
+        android:id="@+id/titleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Vista de Perfil"
+        android:text="Mi Perfil"
+        android:textColor="@color/colorPrimary"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/backButton"
+        app:layout_constraintBottom_toBottomOf="@id/backButton"/>
+
+    <!-- Profile Section -->
+    <FrameLayout
+        android:id="@+id/profileImageContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        app:layout_constraintTop_toBottomOf="@id/titleText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profileImage"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/ic_profile_placeholder"
+            app:civ_border_width="2dp"
+            app:civ_border_color="@color/colorPrimary"/>
+
+        <ImageView
+            android:id="@+id/editProfileButton"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_edit"
+            android:background="@drawable/circle_background"
+            android:padding="6dp"
+            android:layout_gravity="bottom|end"
+            android:tint="@color/white"/>
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/userName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="John Doe"
         android:textSize="24sp"
         android:textStyle="bold"
         android:textColor="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/profileImageContainer"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Menu Options -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="32dp"
+        android:padding="16dp"
+        app:layout_constraintTop_toBottomOf="@id/userName">
+
+        <LinearLayout
+            android:id="@+id/profileOption"
+            style="@style/ProfileMenuOption">
+            <ImageView
+                style="@style/ProfileMenuIcon"
+                android:src="@drawable/ic_profile"/>
+            <TextView
+                style="@style/ProfileMenuText"
+                android:text="Perfil"/>
+            <ImageView
+                style="@style/ProfileMenuArrow"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/privacyOption"
+            style="@style/ProfileMenuOption">
+            <ImageView
+                style="@style/ProfileMenuIcon"
+                android:src="@drawable/ic_lock"/>
+            <TextView
+                style="@style/ProfileMenuText"
+                android:text="Política De Privacidad"/>
+            <ImageView
+                style="@style/ProfileMenuArrow"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/settingsOption"
+            style="@style/ProfileMenuOption">
+            <ImageView
+                style="@style/ProfileMenuIcon"
+                android:src="@drawable/ic_settings"/>
+            <TextView
+                style="@style/ProfileMenuText"
+                android:text="Ajustes"/>
+            <ImageView
+                style="@style/ProfileMenuArrow"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/helpOption"
+            style="@style/ProfileMenuOption">
+            <ImageView
+                style="@style/ProfileMenuIcon"
+                android:src="@drawable/ic_help"/>
+            <TextView
+                style="@style/ProfileMenuText"
+                android:text="Ayuda"/>
+            <ImageView
+                style="@style/ProfileMenuArrow"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/logoutOption"
+            style="@style/ProfileMenuOption">
+            <ImageView
+                style="@style/ProfileMenuIcon"
+                android:src="@drawable/ic_logout"/>
+            <TextView
+                style="@style/ProfileMenuText"
+                android:text="Cerrar Sesión"/>
+            <ImageView
+                style="@style/ProfileMenuArrow"/>
+        </LinearLayout>
+
+    </LinearLayout>
 
     <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
