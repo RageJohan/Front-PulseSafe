@@ -15,4 +15,5 @@
     <color name="cardNeumologia">#4169E1</color>
     <color name="settingsBackground">#FFF0F0</color>
     <color name="bottomNavBackground">#FFFFFF</color>
+    <color name="pressureCardBackground">#FFE8E8</color>
 </resources>

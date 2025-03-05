@@ -16,6 +16,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Configurar la barra de estado
         window.statusBarColor = ContextCompat.getColor(this, R.color.white)
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
 
@@ -50,22 +51,28 @@ class MainActivity : AppCompatActivity() {
         )
 
         // Configurar navegación inferior
-        findViewById<BottomNavigationView>(R.id.bottomNavigation).setOnItemSelectedListener { item ->
+        val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottomNavigation)
+        bottomNavigation.selectedItemId = R.id.navigation_home // Seleccionar "Inicio" por defecto
+
+        bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.navigation_home -> true
+                R.id.navigation_home -> {
+                    // Ya estamos en la vista de inicio
+                    true
+                }
                 R.id.navigation_pressure -> {
-                    // Aquí puedes iniciar la actividad de presión
-                    // startActivity(Intent(this, PressureActivity::class.java))
+                    // Navegar a la vista de presión
+                    startActivity(Intent(this, PressureActivity::class.java))
                     true
                 }
                 R.id.navigation_profile -> {
-                    // Aquí puedes iniciar la actividad de perfil
-                    // startActivity(Intent(this, ProfileActivity::class.java))
+                    // Navegar a la vista de perfil
+                    startActivity(Intent(this, ProfileActivity::class.java))
                     true
                 }
                 R.id.navigation_alerts -> {
-                    // Aquí puedes iniciar la actividad de alertas
-                    // startActivity(Intent(this, AlertsActivity::class.java))
+                    // Navegar a la vista de alertas
+                    startActivity(Intent(this, AlertsActivity::class.java))
                     true
                 }
                 else -> false
