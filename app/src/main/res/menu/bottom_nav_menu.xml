@@ -6,7 +6,7 @@
         android:title="Inicio" />
     <item
         android:id="@+id/navigation_pressure"
-        android:icon="@drawable/ic_pressure"
+        android:icon="@drawable/ic_cardio"
         android:title="Presión" />
     <item
         android:id="@+id/navigation_profile"

@@ -13,6 +13,15 @@
         android:theme="@style/Theme.PulseSafe"
         tools:targetApi="31">
         <activity
+            android:name=".FAQFragment"
+            android:exported="false" />
+        <activity
+            android:name=".ContactFragment"
+            android:exported="false" />
+        <activity
+            android:name=".ChangePasswordActivity"
+            android:exported="false" />
+        <activity
             android:name=".HelpActivity"
             android:exported="false" />
         <activity
