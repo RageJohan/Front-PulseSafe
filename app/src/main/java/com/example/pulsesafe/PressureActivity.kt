@@ -37,7 +37,7 @@ class PressureActivity : AppCompatActivity() {
     private val requestPermissions = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
         if (result.all { it.value }) {
             Toast.makeText(this, "Permisos otorgados", Toast.LENGTH_SHORT).show()
-            startPeriodicUpdate() // Iniciar la actualización periódica
+            startPeriodicUpdate()
         } else {
             Toast.makeText(this, "Permisos denegados", Toast.LENGTH_SHORT).show()
         }
