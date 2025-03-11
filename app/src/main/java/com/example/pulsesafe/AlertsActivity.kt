@@ -1,120 +1,169 @@
 package com.example.pulsesafe
-
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.View
-import android.widget.ImageButton
-import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
+import com.example.pulsesafe.R
+import com.example.pulsesafe.api.RetrofitClient
+import com.example.pulsesafe.model.Notificacion
+import com.example.pulsesafe.utils.SessionManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class AlertsActivity : AppCompatActivity() {
+
+    private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var notificationContainer: LinearLayout
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_alerts)
 
-        // Configurar la barra de estado
-        window.statusBarColor = ContextCompat.getColor(this, R.color.white)
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        // Usa SessionManager en lugar de SharedPreferences manual
+        val sessionManager = SessionManager(this)
+        val idUsuario = sessionManager.getUserId()
+        Log.d("AlertsActivity", "ID de usuario obtenido de SessionManager: $idUsuario") // <-- Imprime el ID obtenido
 
-        // Configurar botón de retroceso
-        findViewById<ImageButton>(R.id.backButton).setOnClickListener {
-            onBackPressed()
+
+        notificationContainer = findViewById(R.id.notificationContainer)
+
+        if (idUsuario != 0L) {  // 0L es el valor por defecto en getUserId()
+            obtenerNotificaciones(idUsuario)
+        } else {
+            Log.e("AlertsActivity", "ID de usuario no encontrado en SessionManager")
+            Toast.makeText(this, "Error: Usuario no encontrado", Toast.LENGTH_SHORT).show()
         }
 
-        // Configurar las notificaciones
-        setupNotifications()
-
-        // Configurar navegación inferior
         val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottomNavigation)
-        bottomNavigation.selectedItemId = R.id.navigation_alerts
+        bottomNavigation.selectedItemId = R.id.navigation_home // Seleccionar "Inicio" por defecto
 
         bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
-                    startActivity(Intent(this, MainActivity::class.java))
-                    finish()
+                    // Ya estamos en la vista de inicio
                     true
                 }
                 R.id.navigation_pressure -> {
+                    // Navegar a la vista de presión
                     startActivity(Intent(this, PressureActivity::class.java))
-                    finish()
                     true
                 }
                 R.id.navigation_profile -> {
+                    // Navegar a la vista de perfil
                     startActivity(Intent(this, ProfileActivity::class.java))
-                    finish()
                     true
                 }
-                R.id.navigation_alerts -> true
+                R.id.navigation_alerts -> {
+                    // Navegar a la vista de alertas
+                    startActivity(Intent(this, AlertsActivity::class.java))
+                    true
+                }
                 else -> false
             }
         }
     }
 
-    private fun setupNotifications() {
-        // Configurar las notificaciones de hoy
-        setupNotification(
-            R.id.notification1,
-            "Tu Presión Arterial Estuvo Dentro De Los Niveles Normales Durante El Día",
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            "2 Min",
-            true
-        )
+    private fun obtenerTextoFecha(fecha: String): String {
+        val formato = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val fechaNotificacion = formato.parse(fecha)
+        val hoy = Calendar.getInstance()
+        val ayer = Calendar.getInstance()
+        ayer.add(Calendar.DAY_OF_YEAR, -1)
 
-        setupNotification(
-            R.id.notification2,
-            "Realizaste 3 Medicaciones Con Resultados Estables",
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            "2 Hr",
-            true
-        )
-
-        setupNotification(
-            R.id.notification3,
-            "Frecuencia Cardiaca Estable: 75 BPM",
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            "3 Hr",
-            true
-        )
-
-        // Configurar la notificación de ayer
-        setupNotification(
-            R.id.notification4,
-            "Nivel Alto De Presión Arterial",
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            "1 D",
-            false
-        )
-
-        // Configurar la notificación del 15 de enero
-        setupNotification(
-            R.id.notification5,
-            "No Se Detectaron Anomalías En Tu Presión Arterial",
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            "5 D",
-            false
-        )
+        return when {
+            formato.format(hoy.time) == fecha -> "Hoy"
+            formato.format(ayer.time) == fecha -> "Ayer"
+            else -> SimpleDateFormat("dd 'de' MMMM", Locale("es")).format(fechaNotificacion)
+        }
     }
 
-    private fun setupNotification(
-        viewId: Int,
-        title: String,
-        description: String,
-        time: String,
-        isRed: Boolean
-    ) {
-        val view = findViewById<View>(viewId)
-        view.findViewById<TextView>(R.id.notificationTitle).text = title
-        view.findViewById<TextView>(R.id.notificationDescription).text = description
-        view.findViewById<TextView>(R.id.notificationTime).text = time
+    private fun obtenerNotificaciones(idUsuario: Long) {
+        RetrofitClient.instance.getNotificaciones(idUsuario).enqueue(object : Callback<List<Notificacion>> {
+            override fun onResponse(call: Call<List<Notificacion>>, response: Response<List<Notificacion>>) {
+                if (response.isSuccessful) {
+                    val notificaciones = response.body()
+                    if (!notificaciones.isNullOrEmpty()) {
+                        mostrarNotificaciones(notificaciones)
+                    } else {
+                        mostrarMensaje("No hay notificaciones")
+                    }
+                } else {
+                    Log.e("AlertsActivity", "Error en la respuesta del servidor: ${response.code()}")
+                    mostrarMensaje("Error al obtener notificaciones")
+                }
+            }
 
-        val icon = view.findViewById<ImageView>(R.id.notificationIcon)
-        icon.backgroundTintList = ContextCompat.getColorStateList(
-            this,
-            if (isRed) R.color.colorPrimary else R.color.pressureCardBackground
-        )
+            override fun onFailure(call: Call<List<Notificacion>>, t: Throwable) {
+                Log.e("AlertsActivity", "Error en la conexión con la API", t)
+                mostrarMensaje("Error de conexión")
+            }
+        })
+    }
+    private fun formatearFecha(timestamp: String): String {
+        return timestamp.replace("T", " ").substring(0, 16) // Quita "T" y deja "YYYY-MM-DD HH:mm"
+    }
+
+    private fun mostrarNotificaciones(notificaciones: List<Notificacion>) {
+        runOnUiThread {
+            notificationContainer.visibility = View.VISIBLE
+            notificationContainer.removeAllViews()
+
+            // Agrupar por fecha
+            val notificacionesAgrupadas = notificaciones.groupBy { it.timestamp.substring(0, 10) }
+
+            for ((fecha, listaNotificaciones) in notificacionesAgrupadas.toSortedMap(compareByDescending { it })) {
+                for (notificacion in listaNotificaciones.asReversed()) {
+
+                // Crear un TextView para la fecha
+                val fechaTextView = TextView(this).apply {
+                    text = obtenerTextoFecha(fecha)
+                    textSize = 16f
+                    setTextColor(resources.getColor(R.color.colorPrimary))
+                    setPadding(16, 8, 16, 8)
+                }
+                notificationContainer.addView(fechaTextView)
+
+                // Agregar notificaciones de esta fecha
+// Agregar notificaciones de esta fecha
+                for (notificacion in listaNotificaciones) {
+                    val itemView = layoutInflater.inflate(R.layout.item_notification, null)
+
+                    val tvTitulo = itemView.findViewById<TextView>(R.id.notificationTitle)
+                    val tvDescripcion = itemView.findViewById<TextView>(R.id.notificationDescription)
+                    val tvHora = itemView.findViewById<TextView>(R.id.notificationTime)
+
+                    tvTitulo.text = notificacion.tipo_alerta ?: "Alerta"
+                    tvDescripcion.text = notificacion.mensaje ?: "Sin descripción"
+                    tvHora.text = notificacion.timestamp ?: "00:00"
+
+                    notificationContainer.addView(itemView)
+                }
+
+            } }
+        }
+    }
+
+
+    private fun mostrarMensaje(mensaje: String) {
+        runOnUiThread {
+            notificationContainer.removeAllViews()
+            val textView = TextView(this).apply {
+                text = mensaje
+                textSize = 18f
+                setPadding(16, 16, 16, 16)
+            }
+            notificationContainer.addView(textView)
+        }
     }
 }

@@ -25,10 +25,10 @@
         android:textColor="@color/colorPrimary"
         android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@id/markAllButton"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/backButton"
         app:layout_constraintTop_toTopOf="@id/backButton"
-        app:layout_constraintBottom_toBottomOf="@id/backButton"/>
+        app:layout_constraintBottom_toBottomOf="@id/backButton"
+        app:layout_constraintEnd_toStartOf="@id/markAllButton" />
 
     <TextView
         android:id="@+id/markAllButton"
@@ -41,7 +41,7 @@
         android:background="?attr/selectableItemBackground"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/backButton"
-        app:layout_constraintBottom_toBottomOf="@id/backButton"/>
+        app:layout_constraintBottom_toBottomOf="@id/backButton" />
 
     <!-- Content -->
     <androidx.core.widget.NestedScrollView
@@ -52,78 +52,59 @@
         app:layout_constraintBottom_toTopOf="@id/bottomNavigation">
 
         <LinearLayout
+            android:id="@+id/notificationContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Hoy -->
+            <!-- Día de Notificaciones -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hoy"
+                android:text="29 de enero"
                 android:textColor="@color/colorPrimary"
                 android:textSize="16sp"
-                android:background="@drawable/date_background"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="8dp"
                 android:layout_marginBottom="16dp"/>
 
-            <!-- Notificaciones de Hoy -->
-            <include layout="@layout/item_notification"
-                android:id="@+id/notification1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"/>
+            <include layout="@layout/item_notification" android:layout_marginBottom="16dp"/>
+            <include layout="@layout/item_notification" android:layout_marginBottom="16dp"/>
+            <include layout="@layout/item_notification" android:layout_marginBottom="24dp"/>
 
-            <include layout="@layout/item_notification"
-                android:id="@+id/notification2"
+            <!-- Separador -->
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"/>
+                android:layout_height="1dp"
+                android:background="@color/lightGray"
+                android:layout_marginBottom="16dp" />
 
-            <include layout="@layout/item_notification"
-                android:id="@+id/notification3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"/>
-
-            <!-- Ayer -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Ayer"
+                android:text="31 de enero"
                 android:textColor="@color/colorPrimary"
                 android:textSize="16sp"
-                android:background="@drawable/date_background"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="8dp"
                 android:layout_marginBottom="16dp"/>
 
-            <include layout="@layout/item_notification"
-                android:id="@+id/notification4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"/>
+            <include layout="@layout/item_notification" android:layout_marginBottom="16dp"/>
+            <include layout="@layout/item_notification" android:layout_marginBottom="16dp"/>
+            <include layout="@layout/item_notification" android:layout_marginBottom="24dp"/>
 
-            <!-- 15 de Enero -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/lightGray"
+                android:layout_marginBottom="16dp" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="15 de Enero"
+                android:text="4 de febrero"
                 android:textColor="@color/colorPrimary"
                 android:textSize="16sp"
-                android:background="@drawable/date_background"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="8dp"
                 android:layout_marginBottom="16dp"/>
 
-            <include layout="@layout/item_notification"
-                android:id="@+id/notification5"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"/>
-
+            <include layout="@layout/item_notification" android:layout_marginBottom="16dp"/>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

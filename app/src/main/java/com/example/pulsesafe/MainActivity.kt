@@ -1,7 +1,9 @@
 package com.example.pulsesafe
 
+
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -9,12 +11,22 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import com.example.pulsesafe.utils.SessionManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val sessionManager = SessionManager(this)
+        val userName = sessionManager.getUserName()
+        val userId = sessionManager.getUserId()
+        Log.d("MainActivity", "Usuario en MainActivity - ID: $userId, Nombre: $userName") // <-- Imprime los valores obtenidos
+        // Obtiene el nombre guardado
+
+        val userNameText = findViewById<TextView>(R.id.userName)
+        userNameText.text = "¡Hola, $userName!"
 
         // Configurar la barra de estado
         window.statusBarColor = ContextCompat.getColor(this, R.color.white)

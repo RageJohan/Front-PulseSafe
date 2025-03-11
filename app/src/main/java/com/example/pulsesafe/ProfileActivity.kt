@@ -1,12 +1,15 @@
 package com.example.pulsesafe
 
+
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.example.pulsesafe.utils.SessionManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class ProfileActivity : AppCompatActivity() {
@@ -17,6 +20,13 @@ class ProfileActivity : AppCompatActivity() {
         // Configurar la barra de estado
         window.statusBarColor = ContextCompat.getColor(this, R.color.white)
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+
+        val sessionManager = SessionManager(this)
+        val userName = sessionManager.getUserName() // Obtener nombre guardado
+
+        // Mostrar el nombre del usuario en el perfil
+        val userNameText = findViewById<TextView>(R.id.userName)
+        userNameText.text = userName // Asegúrate de que 'userNameText' está en tu XML
 
         // Configurar botón de retroceso
         findViewById<ImageButton>(R.id.backButton).setOnClickListener {
@@ -41,7 +51,7 @@ class ProfileActivity : AppCompatActivity() {
         }
 
         findViewById<LinearLayout>(R.id.logoutOption).setOnClickListener {
-            // Implementar lógica de cierre de sesión
+            sessionManager.clearSession() // Limpiar datos al cerrar sesión
             startActivity(Intent(this, LoginActivity::class.java))
             finishAffinity() // Cierra todas las actividades anteriores
         }

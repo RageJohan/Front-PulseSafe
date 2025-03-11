@@ -2,86 +2,62 @@ package com.example.pulsesafe
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.method.PasswordTransformationMethod
-import android.view.View
 import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.pulsesafe.api.RetrofitClient
+import com.example.pulsesafe.utils.SessionManager
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
+import com.tecsup.pulsesafe.model.Usuario
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        // Inicializar vistas
-        val backButton = findViewById<ImageButton>(R.id.backButton)
         val emailEditText = findViewById<EditText>(R.id.emailEditText)
-        val passwordInputLayout = findViewById<TextInputLayout>(R.id.passwordInputLayout)
-        val passwordEditText = findViewById<TextInputEditText>(R.id.passwordEditText)
-        val forgotPasswordTextView = findViewById<TextView>(R.id.forgotPasswordTextView)
+        val passwordEditText = findViewById<EditText>(R.id.passwordEditText)
         val loginButton = findViewById<MaterialButton>(R.id.loginButton)
-        val registerLinkTextView = findViewById<TextView>(R.id.registerLinkTextView)
 
-        // Configurar botón de retroceso
-        backButton.setOnClickListener {
-            onBackPressed()
-        }
+        val sessionManager = SessionManager(this) // Instancia de SessionManager
 
-        // Configurar botón de login
         loginButton.setOnClickListener {
             val email = emailEditText.text.toString().trim()
             val password = passwordEditText.text.toString().trim()
 
-            if (validateInputs(email, password)) {
-                // Redirigir a MainActivity
-                val intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
-                finish() // Cierra la actividad de login para que no vuelva atrás
+            if (email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Por favor, completa todos los campos", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
+
+            val usuario = Usuario(email = email, password = password)
+
+            RetrofitClient.instance.login(usuario).enqueue(object : Callback<Map<String, Any>> {
+                override fun onResponse(call: Call<Map<String, Any>>, response: Response<Map<String, Any>>) {
+                    if (response.isSuccessful && response.body() != null) {
+                        val body = response.body()!!
+                        val id = (body["idUsuario"] as? Double)?.toLong() ?: 0L
+
+                        val nombre = body["nombre"] as? String ?: "Usuario"
+
+
+                        sessionManager.saveUser(id, nombre, email)
+
+                        Toast.makeText(this@LoginActivity, "Bienvenido $nombre", Toast.LENGTH_SHORT).show()
+                        startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                        finish()
+                    } else {
+                        Toast.makeText(this@LoginActivity, "Credenciales incorrectas", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<Map<String, Any>>, t: Throwable) {
+                    Toast.makeText(this@LoginActivity, "Error de conexión: ${t.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
         }
-
-        // Configurar enlace a registro
-        registerLinkTextView.setOnClickListener {
-            val intent = Intent(this, RegisterActivity::class.java)
-            startActivity(intent)
-            finish()
-        }
-
-        // Configurar enlace de olvidé mi contraseña
-        forgotPasswordTextView.setOnClickListener {
-            // Aquí iría la lógica para recuperar contraseña
-            // Por ahora, solo mostramos un mensaje
-            // Toast.makeText(this, "Funcionalidad de recuperar contraseña", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private fun validateInputs(email: String, password: String): Boolean {
-        var isValid = true
-
-        // Validar email
-        if (email.isEmpty()) {
-            findViewById<EditText>(R.id.emailEditText).error = "El correo es obligatorio"
-            isValid = false
-        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            findViewById<EditText>(R.id.emailEditText).error = "Ingrese un correo válido"
-            isValid = false
-        }
-
-        // Validar contraseña
-        if (password.isEmpty()) {
-            findViewById<TextInputLayout>(R.id.passwordInputLayout).error = "La contraseña es obligatoria"
-            isValid = false
-        } else if (password.length < 6) {
-            findViewById<TextInputLayout>(R.id.passwordInputLayout).error = "La contraseña debe tener al menos 6 caracteres"
-            isValid = false
-        } else {
-            findViewById<TextInputLayout>(R.id.passwordInputLayout).error = null
-        }
-
-        return isValid
     }
 }

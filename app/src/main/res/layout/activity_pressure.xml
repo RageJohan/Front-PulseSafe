@@ -95,13 +95,18 @@
                     android:textSize="16sp"
                     android:textStyle="bold"/>
 
+                <!-- TextView para mostrar la frecuencia cardíaca -->
                 <TextView
+                    android:id="@+id/heartRateTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Valor en PPM."
+                    android:text="Cargando frecuencia cardíaca..."
                     android:textColor="@color/black"
-                    android:textSize="14sp"
-                    android:layout_marginTop="4dp"/>
+                    android:textSize="48sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="8dp"
+                    android:layout_gravity="center"
+                    />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
     </LinearLayout>
