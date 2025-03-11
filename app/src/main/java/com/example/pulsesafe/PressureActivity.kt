@@ -27,22 +27,18 @@ import java.time.temporal.ChronoUnit
 class PressureActivity : AppCompatActivity() {
     private lateinit var healthClient: HealthConnectClient
     private lateinit var heartRateTextView: TextView
-    private var updateJob: Job? = null // Job para la actualización periódica
+    private var updateJob: Job? = null
 
-    // Conjunto de permisos necesarios
     private val PERMISSIONS = setOf(
         HealthPermission.getReadPermission(HeartRateRecord::class),
         HealthPermission.getWritePermission(HeartRateRecord::class)
     )
 
-    // Lanzador de permisos
     private val requestPermissions = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
         if (result.all { it.value }) {
-            // Permisos otorgados
             Toast.makeText(this, "Permisos otorgados", Toast.LENGTH_SHORT).show()
             startPeriodicUpdate() // Iniciar la actualización periódica
         } else {
-            // Permisos denegados
             Toast.makeText(this, "Permisos denegados", Toast.LENGTH_SHORT).show()
         }
     }
@@ -51,27 +47,24 @@ class PressureActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pressure)
 
-        // Configurar la barra de estado
         window.statusBarColor = ContextCompat.getColor(this, R.color.white)
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
 
-        // Configurar botón de retroceso
         findViewById<ImageButton>(R.id.backButton).setOnClickListener {
             onBackPressed()
         }
 
-        // Inicializar el cliente de Health Connect
         healthClient = HealthConnectClient.getOrCreate(this)
 
-        // Inicializar TextView para mostrar la frecuencia cardíaca
+
         heartRateTextView = findViewById(R.id.heartRateTextView)
 
-        // Verificar y solicitar permisos
+
         CoroutineScope(Dispatchers.Main).launch {
             checkPermissionsAndRun(healthClient)
         }
 
-        // Configurar navegación inferior
+
         val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottomNavigation)
         bottomNavigation.selectedItemId = R.id.navigation_pressure
 
@@ -98,21 +91,21 @@ class PressureActivity : AppCompatActivity() {
         }
     }
 
-    // Función para verificar permisos y ejecutar la lógica
+
     private suspend fun checkPermissionsAndRun(healthConnectClient: HealthConnectClient) {
         val granted = healthConnectClient.permissionController.getGrantedPermissions()
         if (granted.containsAll(PERMISSIONS)) {
-            // Permisos ya otorgados
+
             Toast.makeText(this, "Permisos ya otorgados", Toast.LENGTH_SHORT).show()
-            startPeriodicUpdate() // Iniciar la actualización periódica
+            startPeriodicUpdate()
         } else {
-            // Solicitar permisos
-            println("Solicitando permisos...")  // Log de depuración
+
+            println("Solicitando permisos...")
             requestPermissions.launch(PERMISSIONS.toTypedArray())
         }
     }
 
-    // Función para leer la frecuencia cardíaca
+
     private suspend fun readHeartRate() {
         val now = Instant.now()
         val request = ReadRecordsRequest(
@@ -121,35 +114,33 @@ class PressureActivity : AppCompatActivity() {
         )
 
         try {
-            // Leer los registros de frecuencia cardíaca
             val response = healthClient.readRecords(request)
             val latestHeartRate = response.records.lastOrNull()?.samples?.lastOrNull()?.beatsPerMinute
 
-            // Actualizar la UI en el hilo principal
             withContext(Dispatchers.Main) {
                 heartRateTextView.text = latestHeartRate?.toString() ?: "No disponible"
             }
         } catch (e: Exception) {
-            // Manejar errores
+
             withContext(Dispatchers.Main) {
                 Toast.makeText(this@PressureActivity, "Error al leer la frecuencia cardíaca: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    // Función para iniciar la actualización periódica
+
     private fun startPeriodicUpdate() {
         updateJob = CoroutineScope(Dispatchers.Main).launch {
             while (true) {
-                readHeartRate() // Leer la frecuencia cardíaca
-                delay(2000) // Esperar 5 segundos antes de la próxima actualización
+                readHeartRate()
+                delay(2000)
             }
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        // Detener la actualización periódica cuando la actividad se destruye
+
         updateJob?.cancel()
     }
 }
